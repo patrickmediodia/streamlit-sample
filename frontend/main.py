@@ -5,6 +5,7 @@ import streamlit as st
 from dotenv import load_dotenv
 
 load_dotenv()
+
 API_ENDPOINT = os.environ.get("API_ENDPOINT")
 
 def show_posts():
@@ -13,9 +14,13 @@ def show_posts():
 
     for post in data:
         st.write(f"### {post['title']}")
-        for tag in post['tags']:
-            st.write(f"`{tag}`")
-        st.write(post['content'])
+
+        tags = post['tags']
+        tags = [ f"`{tag}`" for tag in tags ]
+        tags_string = ', '.join(tags)
+        st.write(f"Tags: {tags_string}")
+
+        st.markdown(post['content'])
 
 def main():
     st.write("# Blog Posts")
