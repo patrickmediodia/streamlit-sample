@@ -6,6 +6,10 @@ app = FastAPI()
 def root():
     return "Hello, world!"
 
+@app.get("/")
+def root():
+    return "Hello, world!"
+
 @app.get("/table")
 def get_table():
     return [
