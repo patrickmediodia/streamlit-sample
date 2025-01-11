@@ -34,3 +34,14 @@ async def put_post_route(post: Post):
             return post
     else:
         return { "error": "Post not found" }
+
+@app.delete("/posts/{id}")
+async def delete_post_route(post: Post):
+    posts = get_posts()
+    for i, p in enumerate(posts):
+        if p['id'] == post.id:
+            del post[i]
+            write_posts(posts)
+            return post
+    else:
+        return { "error": "Post not found" }
