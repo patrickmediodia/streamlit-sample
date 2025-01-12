@@ -8,4 +8,5 @@ def get_posts():
 
 def write_posts(posts: list[Post]):
     with open('posts.json', 'w') as file:
-        json.dump(posts, file)
+        file.write(json.dumps(posts, indent=4))
+

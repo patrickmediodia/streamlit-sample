@@ -21,8 +21,9 @@ async def get_post_route(id: int):
 @app.post("/posts")
 async def post_post_route(post: Post):
     posts = get_posts()
-    posts.append(post)
+    posts.append(post.model_dump())
     write_posts(posts)
+    return posts
 
 @app.put("/posts/{id}")
 async def put_post_route(post: Post):
