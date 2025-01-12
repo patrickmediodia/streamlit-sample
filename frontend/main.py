@@ -28,19 +28,18 @@ def add_post():
             st.rerun()
 
 @st.dialog("Edit Post")
-def edit_post(title, tags, content):
-    st.text_input("Title").value = title
-    st.text_input("Tags").value = tags
-    st.text_area("Content").value = content
+def edit_post(id, title, tags, content):
+    title_input = st.text_input("Title", title)
+    tags_input = st.text_input("Tags", tags)
+    content_input = st.text_area("Content", content)
 
     if st.button("Submit"):
         data = {
-            "title" : st.text_input("Title").value,
-            "tags" : st.text_input("Tags").value.split(","),
-            "content" : st.text_area("Content").value
+            "title" : title_input,
+            "tags" : tags_input.split(","),
+            "content" : content_input
         }
-        st.write(data)
-        response = requests.post(f'{API_ENDPOINT}/posts', data=json.dumps(data))
+        response = requests.put(f'{API_ENDPOINT}/posts/{id}', data=json.dumps(data))
         if not response.ok:
             st.write(response.reason)
         else:
@@ -80,10 +79,10 @@ def show_posts():
         with col1:
             st.write(f"### {post['title']}")
         with col2:
-            if st.button("Edit", key= f'{post['id']}/edit', type="tertiary"):
-                edit_post(post['title'], ', '.join(post['tags']), post['content'])
+            if st.button("Edit", key= f'{post['id']}-edit', type="tertiary"):
+                edit_post(post['id'], post['title'], ', '.join(post['tags']), post['content'])
         with col3:
-            if st.button("Delete", key=f'{post['id']}/delete', type="tertiary"):
+            if st.button("Delete", key=f'{post['id']}-delete', type="tertiary"):
                 delete_post(post['id'])
 
         tags = [ f"`{tag}`" for tag in post['tags'] ]

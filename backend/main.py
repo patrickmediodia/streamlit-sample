@@ -31,14 +31,16 @@ async def post_post_route(post: Post):
     return posts
 
 @app.put("/posts/{id}")
-async def put_post_route(post: Post):
+async def put_post_route(id: str, post: Post):
     posts = get_posts()
 
     for i, p in enumerate(posts):
-        if p['id'] == post.id:
-            posts[i] = post
+        if p['id'] == id:
+            dict_post = post.model_dump()
+            dict_post['id'] = id
+            posts[i] = dict_post
             write_posts(posts)
-            return post
+            return dict_post
     else:
         return { "error": "Post not found" }
 
