@@ -8,7 +8,7 @@ load_dotenv()
 
 API_ENDPOINT = os.environ.get("API_ENDPOINT")
 
-@st.dialog("Add Post")
+@st.dialog("Add Post", width="large")
 def add_post():
     title = st.text_input("Title")
     tags = st.text_input("Tags")
@@ -17,7 +17,7 @@ def add_post():
     if st.button("Submit"):
         data = {
             "title" : title,
-            "tags" : tags.split(","),
+            "tags" : [ tag.strip() for tag in tags.split(",") ],
             "content" : content
         }
         st.write(data)
@@ -27,7 +27,7 @@ def add_post():
         else:
             st.rerun()
 
-@st.dialog("Edit Post")
+@st.dialog("Edit Post", width="large")
 def edit_post(id, title, tags, content):
     title_input = st.text_input("Title", title)
     tags_input = st.text_input("Tags", tags)
@@ -36,7 +36,7 @@ def edit_post(id, title, tags, content):
     if st.button("Submit"):
         data = {
             "title" : title_input,
-            "tags" : tags_input.split(","),
+            "tags" : [ tag.strip() for tag in tags_input.split(",") ],
             "content" : content_input
         }
         response = requests.put(f'{API_ENDPOINT}/posts/{id}', data=json.dumps(data))
@@ -79,11 +79,26 @@ def show_posts():
         with col1:
             st.write(f"### {post['title']}")
         with col2:
-            if st.button("Edit", key= f'{post['id']}-edit', type="tertiary"):
-                edit_post(post['id'], post['title'], ', '.join(post['tags']), post['content'])
+            st.button(
+                "Edit",
+                key= f'{post['id']}-edit',
+                type="tertiary",
+                on_click=edit_post,
+                args=(
+                    post['id'],
+                    post['title'],
+                    ', '.join(post['tags']),
+                    post['content']
+                )
+            )
         with col3:
-            if st.button("Delete", key=f'{post['id']}-delete', type="tertiary"):
-                delete_post(post['id'])
+            st.button(
+                "Delete",
+                key=f'{post['id']}-delete',
+                type="tertiary",
+                on_click=delete_post,
+                args=(post['id'])
+            )
 
         tags = [ f"`{tag}`" for tag in post['tags'] ]
         tags_string = ', '.join(tags)
