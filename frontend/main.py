@@ -24,7 +24,6 @@ def add_post():
 
     if st.button("Submit"):
         data = {
-            "id": 4,
             "title" : title,
             "tags" : tags.split(","),
             "content" : content
@@ -32,7 +31,7 @@ def add_post():
         st.write(data)
         response = requests.post(f'{API_ENDPOINT}/posts', data=json.dumps(data))
         if not response.ok:
-            st.write(response)
+            st.write(response.reason)
         else:
             st.rerun()
 

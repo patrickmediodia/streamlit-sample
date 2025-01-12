@@ -1,4 +1,4 @@
-import json
+import uuid
 from models import Post
 from fastapi import FastAPI
 from db import get_posts, write_posts
@@ -12,6 +12,7 @@ async def get_posts_route():
 @app.get("/posts/{id}")
 async def get_post_route(id: int):
     posts = get_posts()
+
     for post in posts:
         if post['id'] == id:
             return post
@@ -20,14 +21,19 @@ async def get_post_route(id: int):
 
 @app.post("/posts")
 async def post_post_route(post: Post):
+    dict_post = post.model_dump()
+    dict_post['id'] = str(uuid.uuid4())
+
     posts = get_posts()
-    posts.append(post.model_dump())
+    posts.append(dict_post)
+
     write_posts(posts)
     return posts
 
 @app.put("/posts/{id}")
 async def put_post_route(post: Post):
     posts = get_posts()
+
     for i, p in enumerate(posts):
         if p['id'] == post.id:
             posts[i] = post
@@ -39,6 +45,7 @@ async def put_post_route(post: Post):
 @app.delete("/posts/{id}")
 async def delete_post_route(post: Post):
     posts = get_posts()
+
     for i, p in enumerate(posts):
         if p['id'] == post.id:
             del post[i]
