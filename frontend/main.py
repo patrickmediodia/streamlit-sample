@@ -5,7 +5,6 @@ import streamlit as st
 from dotenv import load_dotenv
 
 load_dotenv()
-
 API_ENDPOINT = os.environ.get("API_ENDPOINT")
 
 @st.dialog("Add Post", width="large")
@@ -79,26 +78,11 @@ def show_posts():
         with col1:
             st.write(f"### {post['title']}")
         with col2:
-            st.button(
-                "Edit",
-                key= f'{post['id']}-edit',
-                type="tertiary",
-                on_click=edit_post,
-                args=(
-                    post['id'],
-                    post['title'],
-                    ', '.join(post['tags']),
-                    post['content']
-                )
-            )
+            if st.button("Edit", key= f'{post['id']}-edit', type="tertiary"):
+                edit_post(post['id'], post['title'], ', '.join(post['tags']), post['content'])
         with col3:
-            st.button(
-                "Delete",
-                key=f'{post['id']}-delete',
-                type="tertiary",
-                on_click=delete_post,
-                args=(post['id'])
-            )
+            if st.button("Delete", key=f'{post['id']}-delete', type="tertiary"):
+                delete_post(post['id'])
 
         tags = [ f"`{tag}`" for tag in post['tags'] ]
         tags_string = ', '.join(tags)
