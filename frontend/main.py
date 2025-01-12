@@ -32,23 +32,28 @@ def edit_post(id, title, tags, content):
     tags_input = st.text_input("Tags", tags)
     content_input = st.text_area("Content", content)
 
-    if st.button("Submit"):
-        data = {
-            "title" : title_input,
-            "tags" : [ tag.strip() for tag in tags_input.split(",") ],
-            "content" : content_input
-        }
-        response = requests.put(f'{API_ENDPOINT}/posts/{id}', data=json.dumps(data))
-        if not response.ok:
-            st.write(response.reason)
-        else:
+    col1, col2, col3 = st.columns([1.6, 1.5, 10])
+    with col1:
+        if st.button("Submit", type="primary"):
+            data = {
+                "title" : title_input,
+                "tags" : [ tag.strip() for tag in tags_input.split(",") ],
+                "content" : content_input
+            }
+            response = requests.put(f'{API_ENDPOINT}/posts/{id}', data=json.dumps(data))
+            if not response.ok:
+                st.write(response.reason)
+            else:
+                st.rerun()
+    with col2:
+        if st.button("Close"):
             st.rerun()
 
 @st.dialog("Delete Post")
 def delete_post(id):
     st.write("Are you sure you want to delete this post?")
 
-    col1, col2, col3 = st.columns([1, 1, 5], vertical_alignment="bottom")
+    col1, col2, col3 = st.columns([1.75, 1.75, 10])
     with col1:
         if st.button("Yes", type="primary"):
             response = requests.delete(f"{API_ENDPOINT}/posts/{id}")
@@ -78,11 +83,26 @@ def show_posts():
         with col1:
             st.write(f"### {post['title']}")
         with col2:
-            if st.button("Edit", key= f'{post['id']}-edit', type="tertiary"):
-                edit_post(post['id'], post['title'], ', '.join(post['tags']), post['content'])
+            st.button(
+                "Edit",
+                key= f'{post['id']}-edit',
+                type="tertiary",
+                on_click=edit_post,
+                args=(
+                    post['id'],
+                    post['title'],
+                    ', '.join(post['tags']),
+                    post['content']
+                )
+            )
         with col3:
-            if st.button("Delete", key=f'{post['id']}-delete', type="tertiary"):
-                delete_post(post['id'])
+            st.button(
+                "Delete",
+                key=f'{post['id']}-delete',
+                type="tertiary",
+                on_click=delete_post,
+                args=(post['id'])
+            )
 
         tags = [ f"`{tag}`" for tag in post['tags'] ]
         tags_string = ', '.join(tags)
