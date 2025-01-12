@@ -27,7 +27,7 @@ def add_post():
             st.rerun()
 
 @st.dialog("Edit Post", width="large")
-def edit_post(id, title, tags, content):
+def edit_post(id: str, title: str, tags: list[str], content: str):
     title_input = st.text_input("Title", title)
     tags_input = st.text_input("Tags", tags)
     content_input = st.text_area("Content", content)
@@ -50,7 +50,7 @@ def edit_post(id, title, tags, content):
             st.rerun()
 
 @st.dialog("Delete Post")
-def delete_post(id):
+def delete_post(id: str):
     st.write("Are you sure you want to delete this post?")
 
     col1, col2, col3 = st.columns([1.75, 1.75, 10])
@@ -67,11 +67,11 @@ def delete_post(id):
             st.rerun()
 
 def show_title():
-    col1, col2 = st.columns([6, 1], vertical_alignment="bottom")
+    col1, col2, col3 = st.columns([1, 3, 1], vertical_alignment="bottom")
     with col1:
         st.write("# Blog")
-    with col2:
-        if st.button("Add Post", type="primary"):
+    with col3:
+        if st.button("Add Post", type="primary", use_container_width=True):
             add_post()
 
 def show_posts():
@@ -79,36 +79,33 @@ def show_posts():
     data = response.json()
 
     for post in data:
-        col1, col2, col3 = st.columns([16, 1, 1.5], vertical_alignment="bottom")
-        with col1:
-            st.write(f"### {post['title']}")
-        with col2:
-            st.button(
-                "Edit",
-                key= f'{post['id']}-edit',
-                type="tertiary",
-                on_click=edit_post,
-                args=(
-                    post['id'],
-                    post['title'],
-                    ', '.join(post['tags']),
-                    post['content']
-                )
-            )
-        with col3:
-            st.button(
-                "Delete",
-                key=f'{post['id']}-delete',
-                type="tertiary",
-                on_click=delete_post,
-                args=(post['id'])
-            )
+        st.write(f"### {post['title']}")
 
         tags = [ f"`{tag}`" for tag in post['tags'] ]
         tags_string = ', '.join(tags)
         st.write(f"Tags: {tags_string}")
 
         st.markdown(post['content'])
+
+        st.button(
+            "Edit",
+            key= f'{post['id']}-edit',
+            on_click=edit_post,
+            args=(
+                post['id'],
+                post['title'],
+                ', '.join(post['tags']),
+                post['content']
+            )
+        )
+        st.button(
+            "Delete",
+            key=f'{post['id']}-delete',
+            on_click=delete_post,
+            args=(post['id'],)
+        )
+
+        st.write("###")
 
 def main():
     show_title()
